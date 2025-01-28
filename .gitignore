@@ -1,0 +1,6 @@
+/.editorconfig
+/.env
+/build
+/logs
+/node_modules
+/yarn.lock
