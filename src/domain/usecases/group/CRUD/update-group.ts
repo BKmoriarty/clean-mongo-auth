@@ -1,10 +1,6 @@
 import {GroupUpdate, GroupResponse} from '@/domain/entities/group';
 import {GroupRepository} from '@/domain/repositories/group-repository.interface';
-import {
-  ConflictError,
-  NotFoundError,
-  UUIDError,
-} from '@/infrastructure/http/utils/errors';
+import {ConflictError, NotFoundError, UUIDError} from '@/infrastructure/http/utils/errors';
 import {Types} from 'mongoose';
 
 export class UpdateGroupUseCase {

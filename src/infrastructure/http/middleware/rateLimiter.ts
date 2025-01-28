@@ -7,8 +7,7 @@ export const globalLimiter = rateLimit({
   limit: 100, // Limit each IP to 100 requests per windowMs
   message: {
     status: 'error',
-    message:
-      'Too many requests from this IP, please try again after 15 minutes',
+    message: 'Too many requests from this IP, please try again after 15 minutes',
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -20,8 +19,7 @@ export const authLimiter = rateLimit({
   limit: 5, // Limit each IP to 5 requests per windowMs
   message: {
     status: 'error',
-    message:
-      'Too many login attempts from this IP, please try again after an hour',
+    message: 'Too many login attempts from this IP, please try again after an hour',
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -33,8 +31,7 @@ export const apiLimiter = rateLimit({
   limit: 50, // Limit each IP to 50 requests per windowMs
   message: {
     status: 'error',
-    message:
-      'Too many API requests from this IP, please try again after 15 minutes',
+    message: 'Too many API requests from this IP, please try again after 15 minutes',
   },
   standardHeaders: true,
   legacyHeaders: false,

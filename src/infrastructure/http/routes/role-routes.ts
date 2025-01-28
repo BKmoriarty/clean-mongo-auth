@@ -31,13 +31,7 @@ export const roleRouter = (repository: RoleRepository) => {
 
   router.post('/roles', validate(createRoleSchema), roleController.createRole);
   router.get('/roles', roleController.findAll);
-  // router.get('/roles/:id', roleController.findById);
-  // router.get('/roles/name/:name', roleController.findByName);
-  router.put(
-    '/roles/:id',
-    validate(updateRoleSchema),
-    roleController.updateRole,
-  );
+  router.put('/roles/:id', validate(updateRoleSchema), roleController.updateRole);
   router.delete('/roles/:id', roleController.deleteRole);
 
   return router;

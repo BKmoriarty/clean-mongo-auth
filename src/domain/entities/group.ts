@@ -14,7 +14,7 @@ export interface Group {
 export interface GroupCreate {
   name: string;
   description?: string;
-  roles: string[];
+  roles?: string[];
 }
 
 export interface GroupUpdate {

@@ -5,11 +5,7 @@ import {FindAllRoleUseCase} from '@/domain/usecases/role/findAll-role';
 import {FindByIdRoleUseCase} from '@/domain/usecases/role/findById-role';
 import {FindByNameRoleUseCase} from '@/domain/usecases/role/findByName-role';
 import {UpdateRoleUseCase} from '@/domain/usecases/role/update-role';
-import {
-  ConflictError,
-  NotFoundError,
-  UUIDError,
-} from '@/infrastructure/http/utils/errors';
+import {ConflictError, NotFoundError, UUIDError} from '@/infrastructure/http/utils/errors';
 import {MongoDBRoleRepository} from '@/infrastructure/mongodb/repositories/role-repository';
 import {Types} from 'mongoose';
 
@@ -49,9 +45,7 @@ describe('RoleRepository', () => {
 
     it('should throw ConflictError if role name already exists', async () => {
       await createRoleUseCase.execute(mockRole);
-      await expect(createRoleUseCase.execute(mockRole)).rejects.toThrow(
-        new ConflictError('Role Name'),
-      );
+      await expect(createRoleUseCase.execute(mockRole)).rejects.toThrow(new ConflictError('Role Name'));
     });
   });
 
@@ -80,15 +74,11 @@ describe('RoleRepository', () => {
 
     it('should throw NotFoundError if role not found', async () => {
       const _id = new Types.ObjectId();
-      await expect(findByIdUseCase.execute(_id.toString())).rejects.toThrow(
-        new NotFoundError('Role Id'),
-      );
+      await expect(findByIdUseCase.execute(_id.toString())).rejects.toThrow(new NotFoundError('Role Id'));
     });
 
     it('should throw UUIDError if role id is invalid', async () => {
-      await expect(findByIdUseCase.execute('invalidId')).rejects.toThrow(
-        new UUIDError(),
-      );
+      await expect(findByIdUseCase.execute('invalidId')).rejects.toThrow(new UUIDError());
     });
   });
 
@@ -103,9 +93,7 @@ describe('RoleRepository', () => {
     });
 
     it('should throw NotFoundError if role not found', async () => {
-      await expect(
-        findByNameUseCase.execute('nonexistentName'),
-      ).rejects.toThrow(new NotFoundError('Role Name'));
+      await expect(findByNameUseCase.execute('nonexistentName')).rejects.toThrow(new NotFoundError('Role Name'));
     });
   });
 
@@ -122,15 +110,13 @@ describe('RoleRepository', () => {
 
     it('should throw NotFoundError if role not found', async () => {
       const _id = new Types.ObjectId();
-      await expect(
-        updateRoleUseCase.execute(_id.toString(), {name: 'Updated Name'}),
-      ).rejects.toThrow(new NotFoundError('Role Id'));
+      await expect(updateRoleUseCase.execute(_id.toString(), {name: 'Updated Name'})).rejects.toThrow(
+        new NotFoundError('Role Id'),
+      );
     });
 
     it('should throw UUIDError if role id is invalid', async () => {
-      await expect(
-        updateRoleUseCase.execute('invalidId', {name: 'Updated Name'}),
-      ).rejects.toThrow(new UUIDError());
+      await expect(updateRoleUseCase.execute('invalidId', {name: 'Updated Name'})).rejects.toThrow(new UUIDError());
     });
 
     it('should throw ConflictError if role name already exists', async () => {
@@ -139,9 +125,9 @@ describe('RoleRepository', () => {
         name: 'New Role',
         description: 'New Role',
       });
-      await expect(
-        updateRoleUseCase.execute(role.id!, {name: mockRole.name}),
-      ).rejects.toThrow(new ConflictError('Role Name'));
+      await expect(updateRoleUseCase.execute(role.id!, {name: mockRole.name})).rejects.toThrow(
+        new ConflictError('Role Name'),
+      );
     });
   });
 
@@ -154,15 +140,11 @@ describe('RoleRepository', () => {
 
     it('should throw NotFoundError if role not found', async () => {
       const _id = new Types.ObjectId();
-      await expect(deleteRoleUseCase.execute(_id.toString())).rejects.toThrow(
-        new NotFoundError('Role Id'),
-      );
+      await expect(deleteRoleUseCase.execute(_id.toString())).rejects.toThrow(new NotFoundError('Role Id'));
     });
 
     it('should throw UUIDError if role id is invalid', async () => {
-      await expect(deleteRoleUseCase.execute('invalidId')).rejects.toThrow(
-        new UUIDError(),
-      );
+      await expect(deleteRoleUseCase.execute('invalidId')).rejects.toThrow(new UUIDError());
     });
   });
 });

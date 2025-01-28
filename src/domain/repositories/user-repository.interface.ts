@@ -7,10 +7,6 @@ export interface UserRepository {
   update(id: string, userData: Partial<User>): Promise<UserResponse | null>;
   delete(id: string): Promise<boolean>;
 
-  addGroupRoleToUser(
-    userId: string,
-    groupId: string,
-    roleId: string,
-  ): Promise<UserResponse | null>;
+  addGroupRoleToUser(userId: string, groupId: string, roleId: string): Promise<UserResponse | null>;
   removeGroupRoleFromUser(userId: string, groupId: string): Promise<boolean>;
 }

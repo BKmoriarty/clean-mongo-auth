@@ -1,18 +1,11 @@
-import mongoose, {Schema} from 'mongoose';
+import {z} from 'zod';
 
-const EmbeddedRoleSchema = new Schema(
-  {
-    roleId: {type: Schema.Types.ObjectId, ref: 'Role', required: true},
-    name: {type: String, required: true},
-    description: String,
-  },
-  {_id: false},
-);
-
-const GroupSchema = new Schema({
-  name: {type: String, required: true},
-  description: String,
-  roles: [EmbeddedRoleSchema],
+export const createGroupSchema = z.object({
+  name: z.string().min(2).max(100),
+  description: z.string().optional(),
 });
 
-export const GroupModel = mongoose.model('Group', GroupSchema);
+export const updateGroupSchema = z.object({
+  name: z.string().min(2).max(100).optional(),
+  description: z.string().optional(),
+});

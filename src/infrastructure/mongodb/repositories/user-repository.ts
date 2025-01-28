@@ -18,10 +18,7 @@ export class MongoDBUserRepository implements UserRepository {
     return user ? this.mapToUser(user) : null;
   }
 
-  async update(
-    id: string,
-    userData: Partial<User>,
-  ): Promise<UserResponse | null> {
+  async update(id: string, userData: Partial<User>): Promise<UserResponse | null> {
     const user = await UserModel.findByIdAndUpdate(id, userData, {new: true});
     return user ? this.mapToUser(user) : null;
   }
@@ -31,11 +28,7 @@ export class MongoDBUserRepository implements UserRepository {
     return !!result;
   }
 
-  async addGroupRoleToUser(
-    userId: string,
-    groupId: string,
-    roleId: string,
-  ): Promise<UserResponse | null> {
+  async addGroupRoleToUser(userId: string, groupId: string, roleId: string): Promise<UserResponse | null> {
     const result = await UserModel.findByIdAndUpdate(
       userId,
       {
@@ -51,10 +44,7 @@ export class MongoDBUserRepository implements UserRepository {
     return result ? this.mapToUser(result) : null;
   }
 
-  async removeGroupRoleFromUser(
-    userId: string,
-    groupId: string,
-  ): Promise<boolean> {
+  async removeGroupRoleFromUser(userId: string, groupId: string): Promise<boolean> {
     const result = await UserModel.findByIdAndUpdate(
       userId,
       {

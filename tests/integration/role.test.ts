@@ -23,10 +23,7 @@ describe('Role API Integration Tests', () => {
 
   describe('POST /api/v1/roles', () => {
     it('should respond with 201 and create a new role', async () => {
-      const response = await testApp
-        .post('/api/v1/roles')
-        .send(validRole)
-        .expect(201);
+      const response = await testApp.post('/api/v1/roles').send(validRole).expect(201);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -41,10 +38,7 @@ describe('Role API Integration Tests', () => {
     it('should respond with 409 and not create role with duplicate name', async () => {
       await testApp.post('/api/v1/roles').send(validRole);
 
-      const response = await testApp
-        .post('/api/v1/roles')
-        .send(validRole)
-        .expect(409);
+      const response = await testApp.post('/api/v1/roles').send(validRole).expect(409);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -77,13 +71,11 @@ describe('Role API Integration Tests', () => {
     });
   });
 
-  describe('GET /api/v1/roles?id=', () => {
+  describe('GET /api/v1/roles?id=:id', () => {
     it('should respond with 200 and return a role by id', async () => {
       const role = await createRoleUseCase.execute(validRole);
 
-      const response = await testApp
-        .get(`/api/v1/roles?id=${role.id}`)
-        .expect(200);
+      const response = await testApp.get(`/api/v1/roles?id=${role.id}`).expect(200);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -99,9 +91,7 @@ describe('Role API Integration Tests', () => {
     it('should respond with 404 and not find a role by id', async () => {
       const _id = new Types.ObjectId();
 
-      const response = await testApp
-        .get(`/api/v1/roles?id=${_id.toString()}`)
-        .expect(404);
+      const response = await testApp.get(`/api/v1/roles?id=${_id.toString()}`).expect(404);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -112,9 +102,7 @@ describe('Role API Integration Tests', () => {
     });
 
     it('should respond with 400 and not find a role by invalid id', async () => {
-      const response = await testApp
-        .get('/api/v1/roles?id=invalidId')
-        .expect(400);
+      const response = await testApp.get('/api/v1/roles?id=invalidId').expect(400);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -128,9 +116,7 @@ describe('Role API Integration Tests', () => {
     it('should respond with 200 and return a role by name', async () => {
       const role = await createRoleUseCase.execute(validRole);
 
-      const response = await testApp
-        .get(`/api/v1/roles?name=${role.name}`)
-        .expect(200);
+      const response = await testApp.get(`/api/v1/roles?name=${role.name}`).expect(200);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -144,9 +130,7 @@ describe('Role API Integration Tests', () => {
     });
 
     it('should respond with 404 and not find a role by name', async () => {
-      const response = await testApp
-        .get('/api/v1/roles?name=nonexistentName')
-        .expect(404);
+      const response = await testApp.get('/api/v1/roles?name=nonexistentName').expect(404);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -161,10 +145,7 @@ describe('Role API Integration Tests', () => {
     it('should respond with 200 and update a role by id', async () => {
       const role = await createRoleUseCase.execute(validRole);
 
-      const response = await testApp
-        .put(`/api/v1/roles/${role.id}`)
-        .send({name: 'Updated Name'})
-        .expect(200);
+      const response = await testApp.put(`/api/v1/roles/${role.id}`).send({name: 'Updated Name'}).expect(200);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -178,10 +159,7 @@ describe('Role API Integration Tests', () => {
     it('should respond with 404 and not update a role by id', async () => {
       const _id = new Types.ObjectId();
 
-      const response = await testApp
-        .put(`/api/v1/roles/${_id.toString()}`)
-        .send({name: 'Updated Name'})
-        .expect(404);
+      const response = await testApp.put(`/api/v1/roles/${_id.toString()}`).send({name: 'Updated Name'}).expect(404);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -192,10 +170,7 @@ describe('Role API Integration Tests', () => {
     });
 
     it('should respond with 400 and not update a role by invalid id', async () => {
-      const response = await testApp
-        .put('/api/v1/roles/invalidId')
-        .send({name: 'Updated Name'})
-        .expect(400);
+      const response = await testApp.put('/api/v1/roles/invalidId').send({name: 'Updated Name'}).expect(400);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -210,9 +185,7 @@ describe('Role API Integration Tests', () => {
     it('should respond with 200 and delete a role by id', async () => {
       const role = await createRoleUseCase.execute(validRole);
 
-      const response = await testApp
-        .delete(`/api/v1/roles/${role.id}`)
-        .expect(204);
+      const response = await testApp.delete(`/api/v1/roles/${role.id}`).expect(204);
 
       expect(response.body).not.toHaveProperty('status');
       expect(response.body).not.toHaveProperty('message');
@@ -222,9 +195,7 @@ describe('Role API Integration Tests', () => {
     it('should respond with 404 and not delete a role by id', async () => {
       const _id = new Types.ObjectId();
 
-      const response = await testApp
-        .delete(`/api/v1/roles/${_id.toString()}`)
-        .expect(404);
+      const response = await testApp.delete(`/api/v1/roles/${_id.toString()}`).expect(404);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');
@@ -235,9 +206,7 @@ describe('Role API Integration Tests', () => {
     });
 
     it('should respond with 400 and not delete a role by invalid id', async () => {
-      const response = await testApp
-        .delete('/api/v1/roles/invalidId')
-        .expect(400);
+      const response = await testApp.delete('/api/v1/roles/invalidId').expect(400);
 
       expect(response.body).toHaveProperty('status');
       expect(response.body).toHaveProperty('message');

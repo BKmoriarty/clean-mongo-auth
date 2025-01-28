@@ -1,10 +1,4 @@
-import {
-  EmbeddedRole,
-  Group,
-  GroupCreate,
-  GroupResponse,
-  GroupUpdate,
-} from '@/domain/entities/group';
+import {EmbeddedRole, Group, GroupCreate, GroupResponse, GroupUpdate} from '@/domain/entities/group';
 import {GroupRepository} from '@/domain/repositories/group-repository.interface';
 import {GroupModel} from '../models/group-model';
 import {RoleRepository} from '@/domain/repositories/role-repository.interface';

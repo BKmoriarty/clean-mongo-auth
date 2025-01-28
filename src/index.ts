@@ -15,9 +15,13 @@ const start = async () => {
     const url = `mongodb://${username_mongodb}:${password_mongodb}@${host_mongodb}:${port_mongodb}`;
     // console.log(`Connecting to MongoDB at ${url}`);
 
-    await mongoose.connect(url, {
-      dbName: database_mongodb,
-    });
+    await mongoose
+      .connect(url, {
+        dbName: database_mongodb,
+      })
+      .then(() => {
+        console.log('Connected to MongoDB');
+      });
 
     const app = createApp();
     const port = process.env.PORT || 8080;

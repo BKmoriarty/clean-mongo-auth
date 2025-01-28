@@ -1,11 +1,11 @@
 import {AddRoleToGroupUseCase} from '@/domain/usecases/group/addRoleToGroup-group';
-import {CreateGroupUseCase} from '@/domain/usecases/group/create-group';
-import {DeleteGroupUseCase} from '@/domain/usecases/group/delete-group';
+import {CreateGroupUseCase} from '@/domain/usecases/group/CRUD/create-group';
+import {DeleteGroupUseCase} from '@/domain/usecases/group/CRUD/delete-group';
 import {DeleteAllRolesFromGroupUseCase} from '@/domain/usecases/group/deleteAllRolesFromGroup-group';
-import {FindByIdGroupUseCase} from '@/domain/usecases/group/findById-group';
-import {FindByNameGroupUseCase} from '@/domain/usecases/group/findByName-group';
+import {FindByIdGroupUseCase} from '@/domain/usecases/group/CRUD/findById-group';
+import {FindByNameGroupUseCase} from '@/domain/usecases/group/CRUD/findByName-group';
 import {FindGroupsByRoleUseCase} from '@/domain/usecases/group/findGroupsByRole-group';
-import {UpdateGroupUseCase} from '@/domain/usecases/group/update-group';
+import {UpdateGroupUseCase} from '@/domain/usecases/group/CRUD/update-group';
 import {CreateRoleUseCase} from '@/domain/usecases/role/create-role';
 import {NotFoundError, UUIDError} from '@/infrastructure/http/utils/errors';
 import {MongoDBGroupRepository} from '@/infrastructure/mongodb/repositories/group-repository';
@@ -38,7 +38,7 @@ describe('GroupRepository', () => {
     updateGroupUseCase = new UpdateGroupUseCase(groupRepository);
     deleteGroupUseCase = new DeleteGroupUseCase(groupRepository);
     deleteAllRolesFromGroupUseCase = new DeleteAllRolesFromGroupUseCase(groupRepository);
-    addRoleToGroupUseCase = new AddRoleToGroupUseCase(groupRepository);
+    addRoleToGroupUseCase = new AddRoleToGroupUseCase(groupRepository, roleRepository);
 
     createRoleUseCase = new CreateRoleUseCase(roleRepository);
   });
@@ -309,6 +309,54 @@ describe('GroupRepository', () => {
       await expect(deleteAllRolesFromGroupUseCase.execute(_id.toString())).rejects.toThrow(
         new NotFoundError('Group Id'),
       );
+    });
+  });
+
+  describe('addRoleToGroup', () => {
+    it('should add a role to a group', async () => {
+      const role = await createRoleUseCase.execute({
+        name: 'Role 1',
+        description: 'Role description',
+      });
+      const group = await createGroupUseCase.execute(validGroup);
+
+      const result = await addRoleToGroupUseCase.execute(group.id!, role.id!);
+      expect(result).toBe(true);
+
+      const groups = await findGroupsByRoleUseCase.execute(role.id!);
+      expect(groups.length).toBe(1);
+    });
+
+    it('should throw NotFoundError if group not found', async () => {
+      const role = await createRoleUseCase.execute({
+        name: 'Role 1',
+        description: 'Role description',
+      });
+      const _id = new Types.ObjectId();
+      await expect(addRoleToGroupUseCase.execute(_id.toString(), role.id!)).rejects.toThrow(
+        new NotFoundError('Group Id'),
+      );
+    });
+
+    it('should throw NotFoundError if role not found', async () => {
+      const group = await createGroupUseCase.execute(validGroup);
+      const _id = new Types.ObjectId();
+      await expect(addRoleToGroupUseCase.execute(group.id!, _id.toString())).rejects.toThrow(
+        new NotFoundError('Role Id'),
+      );
+    });
+
+    it('should throw UUIDError if group id is invalid', async () => {
+      const role = await createRoleUseCase.execute({
+        name: 'Role 1',
+        description: 'Role description',
+      });
+      await expect(addRoleToGroupUseCase.execute('invalidId', role.id!)).rejects.toThrow(new UUIDError());
+    });
+
+    it('should throw UUIDError if role id is invalid', async () => {
+      const group = await createGroupUseCase.execute(validGroup);
+      await expect(addRoleToGroupUseCase.execute(group.id!, 'invalidId')).rejects.toThrow(new UUIDError());
     });
   });
 });

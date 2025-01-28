@@ -1,7 +1,4 @@
-import {
-  NotFoundError,
-  ValidationError,
-} from '@/infrastructure/http/utils/errors';
+import {NotFoundError, ValidationError} from '@/infrastructure/http/utils/errors';
 import {GroupRepository} from '../../repositories/group-repository.interface';
 import {RoleRepository} from '../../repositories/role-repository.interface';
 import {UserRepository} from '../../repositories/user-repository.interface';
@@ -14,11 +11,7 @@ export class AddGroupRoleToUserUseCase {
     private roleRepository: RoleRepository,
   ) {}
 
-  async execute(
-    userId: string,
-    groupId: string,
-    roleId: string,
-  ): Promise<UserResponse> {
+  async execute(userId: string, groupId: string, roleId: string): Promise<UserResponse> {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundError('User Id');
@@ -40,11 +33,7 @@ export class AddGroupRoleToUserUseCase {
       throw new ValidationError('Role does not exist in the specified group');
     }
 
-    const userWithGroupRole = await this.userRepository.addGroupRoleToUser(
-      userId,
-      groupId,
-      roleId,
-    );
+    const userWithGroupRole = await this.userRepository.addGroupRoleToUser(userId, groupId, roleId);
     if (!userWithGroupRole) {
       throw new ValidationError('Failed to add group role to user');
     }

@@ -33,8 +33,7 @@ const format = winston.format.combine(
   winston.format.colorize({all: true}),
   // Define the format of the message showing the timestamp, the level and the message
   winston.format.printf(
-    info =>
-      `${info.timestamp} ${info.level}: ${info.message}${info.stack ? '\n' + info.stack : ''}`,
+    info => `${info.timestamp} ${info.level}: ${info.message}${info.stack ? '\n' + info.stack : ''}`,
   ),
 );
 
@@ -48,10 +47,7 @@ const transports = [
     dirname: path.join(process.cwd(), 'logs', 'error'),
     filename: 'error-%DATE%.log',
     level: 'error',
-    format: winston.format.combine(
-      winston.format.uncolorize(),
-      winston.format.json(),
-    ),
+    format: winston.format.combine(winston.format.uncolorize(), winston.format.json()),
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '20m',
@@ -62,10 +58,7 @@ const transports = [
   new DailyRotateFile({
     dirname: path.join(process.cwd(), 'logs', 'combined'),
     filename: 'combined-%DATE%.log',
-    format: winston.format.combine(
-      winston.format.uncolorize(),
-      winston.format.json(),
-    ),
+    format: winston.format.combine(winston.format.uncolorize(), winston.format.json()),
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '20m',

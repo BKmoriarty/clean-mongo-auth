@@ -1,10 +1,6 @@
 import {RoleResponse, RoleUpdate} from '@/domain/entities/role';
 import {RoleRepository} from '@/domain/repositories/role-repository.interface';
-import {
-  ConflictError,
-  NotFoundError,
-  UUIDError,
-} from '@/infrastructure/http/utils/errors';
+import {ConflictError, NotFoundError, UUIDError} from '@/infrastructure/http/utils/errors';
 import {Types} from 'mongoose';
 
 export class UpdateRoleUseCase {

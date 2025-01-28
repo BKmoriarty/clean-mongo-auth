@@ -11,6 +11,8 @@ import logger, {stream} from './utils/logger';
 import {AppError} from './utils/errors';
 import {roleRouter} from './routes/role-routes';
 import {MongoDBRoleRepository} from '../mongodb/repositories/role-repository';
+import {MongoDBGroupRepository} from '../mongodb/repositories/group-repository';
+import {groupRouter} from './routes/group-routes';
 
 export const createApp = () => {
   const app = express();
@@ -32,10 +34,12 @@ export const createApp = () => {
   // Dependencies
   const userRepository = new MongoDBUserRepository();
   const roleRepository = new MongoDBRoleRepository();
+  const groupRepository = new MongoDBGroupRepository(roleRepository);
 
   // Routes
   app.use('/api/v1', userRouter(userRepository));
   app.use('/api/v1', roleRouter(roleRepository));
+  app.use('/api/v1', groupRouter(groupRepository, roleRepository));
 
   // Health check endpoint
   app.get('/api/v1/health', (req: Request, res: Response) => {
@@ -48,10 +52,7 @@ export const createApp = () => {
 
   // 404 handler
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const error = new AppError(
-      `Can't find ${req.originalUrl} on this server!`,
-      404,
-    );
+    const error = new AppError(`Can't find ${req.originalUrl} on this server!`, 404);
     logger.warn(`404 Not Found: ${req.originalUrl}`);
     next(error);
   });

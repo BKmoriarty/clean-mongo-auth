@@ -1,11 +1,7 @@
 import {Group, GroupCreate} from '@/domain/entities/group';
 import {GroupRepository} from '@/domain/repositories/group-repository.interface';
 import {RoleRepository} from '@/domain/repositories/role-repository.interface';
-import {
-  ConflictError,
-  NotFoundError,
-  UUIDError,
-} from '@/infrastructure/http/utils/errors';
+import {ConflictError, NotFoundError, UUIDError} from '@/infrastructure/http/utils/errors';
 import {Types} from 'mongoose';
 
 export class CreateGroupUseCase {
@@ -21,7 +17,7 @@ export class CreateGroupUseCase {
       throw new ConflictError('Group Name');
     }
 
-    if (group.roles.length > 0) {
+    if (group.roles && group.roles.length > 0) {
       await Promise.all(
         group.roles.map(async roleId => {
           if (!Types.ObjectId.isValid(roleId)) {

@@ -1,9 +1,4 @@
-import {
-  Group,
-  GroupCreate,
-  GroupResponse,
-  GroupUpdate,
-} from '../entities/group';
+import {Group, GroupCreate, GroupResponse, GroupUpdate} from '../entities/group';
 
 export interface GroupRepository {
   findAll(): Promise<GroupResponse[]>;

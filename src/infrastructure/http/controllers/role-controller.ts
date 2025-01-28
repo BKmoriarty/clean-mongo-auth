@@ -30,23 +30,10 @@ export class RoleController {
   findAll = catchAsync(async (req: Request, res: Response) => {
     const {name, id} = req.query;
     let roles: RoleResponse | RoleResponse[];
-    if (name) roles = await this.findByNameUseCase.execute(name as string);
-    else if (id) roles = await this.findByIdUseCase.execute(id as string);
+    if (id) roles = await this.findByIdUseCase.execute(id as string);
+    else if (name) roles = await this.findByNameUseCase.execute(name as string);
     else roles = await this.findAllUseCase.execute();
     res.status(200).json(this.mapToResponse('Role found successfully', roles));
-  });
-
-  findById = catchAsync(async (req: Request, res: Response) => {
-    const {id} = req.params;
-    console.log('id', id);
-    const role = await this.findByIdUseCase.execute(id);
-    res.status(200).json(this.mapToResponse('Role found successfully', role));
-  });
-
-  findByName = catchAsync(async (req: Request, res: Response) => {
-    const {name} = req.params;
-    const role = await this.findByNameUseCase.execute(name);
-    res.status(200).json(this.mapToResponse('Role found successfully', role));
   });
 
   updateRole = catchAsync(async (req: Request, res: Response) => {
