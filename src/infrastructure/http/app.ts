@@ -13,6 +13,7 @@ import {roleRouter} from './routes/role-routes';
 import {MongoDBRoleRepository} from '../mongodb/repositories/role-repository';
 import {MongoDBGroupRepository} from '../mongodb/repositories/group-repository';
 import {groupRouter} from './routes/group-routes';
+import actuator from 'express-actuator';
 
 export const createApp = () => {
   const app = express();
@@ -28,6 +29,9 @@ export const createApp = () => {
   app.use(express.json()); // Parse JSON bodies
   app.use(express.urlencoded({extended: true})); // Parse URL-encoded bodies
 
+  // Express actuator
+  app.use(actuator({basePath: '/actuator', infoGitMode: 'full'}));
+
   // Apply global rate limiter
   app.use(globalLimiter);
 
@@ -42,12 +46,8 @@ export const createApp = () => {
   app.use('/api/v1', groupRouter(groupRepository, roleRepository));
 
   // Health check endpoint
-  app.get('/api/v1/health', (req: Request, res: Response) => {
-    logger.info('Health check endpoint called');
-    res.status(200).json({
-      status: 'success',
-      message: 'Server is running',
-    });
+  app.get('/', (req: Request, res: Response) => {
+    res.status(200).send('OK');
   });
 
   // 404 handler
