@@ -18,6 +18,8 @@ import actuator from 'express-actuator';
 export const createApp = () => {
   const app = express();
 
+  const prefix = process.env.PREFIX || '/api/v1';
+
   // Global Middlewares
   app.use(helmet()); // Security headers
   app.use(cors()); // Enable CORS
@@ -30,7 +32,7 @@ export const createApp = () => {
   app.use(express.urlencoded({extended: true})); // Parse URL-encoded bodies
 
   // Express actuator
-  app.use(actuator({basePath: '/actuator', infoGitMode: 'full'}));
+  app.use(actuator({basePath: `${prefix}/actuator`, infoGitMode: 'full'}));
 
   // Apply global rate limiter
   app.use(globalLimiter);
@@ -41,9 +43,9 @@ export const createApp = () => {
   const groupRepository = new MongoDBGroupRepository(roleRepository);
 
   // Routes
-  app.use('/api/v1', userRouter(userRepository));
-  app.use('/api/v1', roleRouter(roleRepository));
-  app.use('/api/v1', groupRouter(groupRepository, roleRepository));
+  app.use(prefix, userRouter(userRepository));
+  app.use(prefix, roleRouter(roleRepository));
+  app.use(prefix, groupRouter(groupRepository, roleRepository));
 
   // Health check endpoint
   app.get('/', (req: Request, res: Response) => {
