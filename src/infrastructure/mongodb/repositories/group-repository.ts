@@ -2,6 +2,7 @@ import {EmbeddedRole, Group, GroupCreate, GroupResponse, GroupUpdate} from '@/do
 import {GroupRepository} from '@/domain/repositories/group-repository.interface';
 import {GroupModel} from '../models/group-model';
 import {RoleRepository} from '@/domain/repositories/role-repository.interface';
+import logger from '@/infrastructure/http/utils/logger';
 
 export class MongoDBGroupRepository implements GroupRepository {
   constructor(private roleRepository: RoleRepository) {}
@@ -64,6 +65,30 @@ export class MongoDBGroupRepository implements GroupRepository {
     return !!result;
   }
 
+  async findChildren(parentId: string): Promise<GroupResponse[]> {
+    const result = await GroupModel.find({parentId}).populate('roles').lean();
+    return result.map(group => this.mapToGroup(group));
+  }
+
+  async findParent(groupId: string): Promise<GroupResponse | null> {
+    const group = await GroupModel.findById(groupId).populate('parentId').lean();
+    logger.debug('group', group);
+    return group ? this.mapToGroup(group) : null;
+    // group?.parentId || null;
+  }
+
+  async getHierarchy(parentId: string | null = null): Promise<GroupResponse[]> {
+    const groups = await GroupModel.find({parentId}).populate('roles').lean();
+
+    logger.debug('groups', groups);
+
+    // for (const group of groups) {
+    //   group.children = await this.getHierarchy(group.id); // ✅ No more TypeScript error
+    // }
+
+    return groups.map(group => this.mapToGroup(group));
+  }
+
   private mapToGroup(doc: any): GroupResponse {
     return {
       id: doc._id.toString(),
@@ -83,6 +108,8 @@ export class MongoDBGroupRepository implements GroupRepository {
       name: doc.name,
       description: doc.description,
       roles: doc.roles.map((role: string) => role.toString()),
+      parentId: doc.parentId ? doc.parentId.toString() : null,
+      children: doc.children ? doc.children.map((child: string) => child.toString()) : [],
     };
   }
 }

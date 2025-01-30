@@ -11,6 +11,7 @@ import {NotFoundError, UUIDError} from '@/infrastructure/http/utils/errors';
 import {MongoDBGroupRepository} from '@/infrastructure/mongodb/repositories/group-repository';
 import {MongoDBRoleRepository} from '@/infrastructure/mongodb/repositories/role-repository';
 import {Types} from 'mongoose';
+import {FindChildrenUseCase} from '@/domain/usecases/group/findChildren-group';
 
 describe('GroupRepository', () => {
   let groupRepository: MongoDBGroupRepository;
@@ -19,11 +20,14 @@ describe('GroupRepository', () => {
   let createGroupUseCase: CreateGroupUseCase;
   let findByIdUseCase: FindByIdGroupUseCase;
   let findByNameUseCase: FindByNameGroupUseCase;
-  let findGroupsByRoleUseCase: FindGroupsByRoleUseCase;
   let updateGroupUseCase: UpdateGroupUseCase;
   let deleteGroupUseCase: DeleteGroupUseCase;
+
+  let findGroupsByRoleUseCase: FindGroupsByRoleUseCase;
   let deleteAllRolesFromGroupUseCase: DeleteAllRolesFromGroupUseCase;
   let addRoleToGroupUseCase: AddRoleToGroupUseCase;
+
+  let findChildrenUseCase: FindChildrenUseCase;
 
   let createRoleUseCase: CreateRoleUseCase;
 
@@ -34,11 +38,14 @@ describe('GroupRepository', () => {
     createGroupUseCase = new CreateGroupUseCase(groupRepository, roleRepository);
     findByIdUseCase = new FindByIdGroupUseCase(groupRepository);
     findByNameUseCase = new FindByNameGroupUseCase(groupRepository);
-    findGroupsByRoleUseCase = new FindGroupsByRoleUseCase(groupRepository);
     updateGroupUseCase = new UpdateGroupUseCase(groupRepository);
     deleteGroupUseCase = new DeleteGroupUseCase(groupRepository);
+
+    findGroupsByRoleUseCase = new FindGroupsByRoleUseCase(groupRepository);
     deleteAllRolesFromGroupUseCase = new DeleteAllRolesFromGroupUseCase(groupRepository);
     addRoleToGroupUseCase = new AddRoleToGroupUseCase(groupRepository, roleRepository);
+
+    findChildrenUseCase = new FindChildrenUseCase(groupRepository);
 
     createRoleUseCase = new CreateRoleUseCase(roleRepository);
   });
@@ -122,6 +129,168 @@ describe('GroupRepository', () => {
         createGroupUseCase.execute({
           ...validGroup,
           roles: ['invalid-role-id'],
+        }),
+      ).rejects.toThrow(new UUIDError());
+    });
+
+    it('should create a new group with parent group', async () => {
+      const parentGroup = await createGroupUseCase.execute(validGroup);
+      const group = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 2',
+        parentId: parentGroup.id,
+      });
+
+      expect(group).toHaveProperty('id');
+      expect(group.name).toBe('Group 2');
+      expect(group.description).toBe(validGroup.description);
+      expect(group.parentId).toBe(parentGroup.id);
+    });
+
+    it('should create a new group with parent group and roles', async () => {
+      const role = await createRoleUseCase.execute({
+        name: 'Role 1',
+        description: 'Role description',
+      });
+      const parentGroup = await createGroupUseCase.execute(validGroup);
+      const group = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 2',
+        parentId: parentGroup.id,
+        roles: [role.id!],
+      });
+
+      expect(group).toHaveProperty('id');
+      expect(group.name).toBe('Group 2');
+      expect(group.description).toBe(validGroup.description);
+      expect(group.parentId).toBe(parentGroup.id);
+
+      expect(group.roles.length).toBe(1);
+      expect(group.roles[0]).toBe(role.id);
+    });
+
+    it('should create a new group with 3 parent groups', async () => {
+      const parentGroup = await createGroupUseCase.execute(validGroup);
+      const parentGroup2 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Parent Group 2',
+      });
+      const parentGroup3 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Parent Group 3',
+      });
+
+      const group = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 2',
+        parentId: parentGroup.id,
+      });
+
+      const group2 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 3',
+        parentId: parentGroup2.id,
+      });
+
+      const group3 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 4',
+        parentId: parentGroup3.id,
+      });
+
+      expect(group).toHaveProperty('id');
+      expect(group.name).toBe('Group 2');
+      expect(group.description).toBe(validGroup.description);
+      expect(group.parentId).toBe(parentGroup.id);
+
+      expect(group2).toHaveProperty('id');
+      expect(group2.name).toBe('Group 3');
+      expect(group2.description).toBe(validGroup.description);
+      expect(group2.parentId).toBe(parentGroup2.id);
+
+      expect(group3).toHaveProperty('id');
+      expect(group3.name).toBe('Group 4');
+      expect(group3.description).toBe(validGroup.description);
+      expect(group3.parentId).toBe(parentGroup3.id);
+    });
+
+    it('should create a new group with 3 parent groups and roles', async () => {
+      const role = await createRoleUseCase.execute({
+        name: 'Role 1',
+        description: 'Role description',
+      });
+
+      const parentGroup = await createGroupUseCase.execute(validGroup);
+      const parentGroup2 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Parent Group 2',
+      });
+      const parentGroup3 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Parent Group 3',
+      });
+
+      const group = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 2',
+        parentId: parentGroup.id,
+        roles: [role.id!],
+      });
+
+      const group2 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 3',
+        parentId: parentGroup2.id,
+        roles: [role.id!],
+      });
+
+      const group3 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 4',
+        parentId: parentGroup3.id,
+        roles: [role.id!],
+      });
+
+      expect(group).toHaveProperty('id');
+      expect(group.name).toBe('Group 2');
+      expect(group.description).toBe(validGroup.description);
+      expect(group.parentId).toBe(parentGroup.id);
+
+      expect(group.roles.length).toBe(1);
+      expect(group.roles[0]).toBe(role.id);
+
+      expect(group2).toHaveProperty('id');
+      expect(group2.name).toBe('Group 3');
+      expect(group2.description).toBe(validGroup.description);
+      expect(group2.parentId).toBe(parentGroup2.id);
+
+      expect(group2.roles.length).toBe(1);
+      expect(group2.roles[0]).toBe(role.id);
+
+      expect(group3).toHaveProperty('id');
+      expect(group3.name).toBe('Group 4');
+      expect(group3.description).toBe(validGroup.description);
+      expect(group3.parentId).toBe(parentGroup3.id);
+
+      expect(group3.roles.length).toBe(1);
+      expect(group3.roles[0]).toBe(role.id);
+    });
+
+    it('should throw NotFoundError if parent group not found', async () => {
+      const _id = new Types.ObjectId();
+      await expect(
+        createGroupUseCase.execute({
+          ...validGroup,
+          parentId: _id.toString(),
+        }),
+      ).rejects.toThrow(new NotFoundError('Parent Group Id'));
+    });
+
+    it('should throw UUIDError if parent group id is invalid', async () => {
+      await expect(
+        createGroupUseCase.execute({
+          ...validGroup,
+          parentId: 'invalidId',
         }),
       ).rejects.toThrow(new UUIDError());
     });
@@ -357,6 +526,42 @@ describe('GroupRepository', () => {
     it('should throw UUIDError if role id is invalid', async () => {
       const group = await createGroupUseCase.execute(validGroup);
       await expect(addRoleToGroupUseCase.execute(group.id!, 'invalidId')).rejects.toThrow(new UUIDError());
+    });
+  });
+
+  describe('findChildren', () => {
+    it('should find all children of a group', async () => {
+      const parentGroup = await createGroupUseCase.execute(validGroup);
+      const group1 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 2',
+        parentId: parentGroup.id,
+      });
+      const group2 = await createGroupUseCase.execute({
+        ...validGroup,
+        name: 'Group 3',
+        parentId: parentGroup.id,
+      });
+
+      const children = await findChildrenUseCase.execute(parentGroup.id!);
+      expect(children.length).toBe(2);
+      expect(children[0].id).toBe(group1.id);
+      expect(children[1].id).toBe(group2.id);
+    });
+
+    it('should resolve empty array if no children found', async () => {
+      const parentGroup = await createGroupUseCase.execute(validGroup);
+      const children = await findChildrenUseCase.execute(parentGroup.id!);
+      expect(children).toEqual([]);
+    });
+
+    it('should throw NotFoundError if parent group not found', async () => {
+      const _id = new Types.ObjectId();
+      await expect(findChildrenUseCase.execute(_id.toString())).rejects.toThrow(new NotFoundError('Parent Group Id'));
+    });
+
+    it('should throw UUIDError if parent group id is invalid', async () => {
+      await expect(findChildrenUseCase.execute('invalidId')).rejects.toThrow(new UUIDError());
     });
   });
 });

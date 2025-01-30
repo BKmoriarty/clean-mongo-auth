@@ -32,6 +32,16 @@ export class CreateGroupUseCase {
       );
     }
 
+    if (group.parentId) {
+      if (!Types.ObjectId.isValid(group.parentId)) {
+        throw new UUIDError();
+      }
+      const parentGroup = await this.groupRepository.findById(group.parentId);
+      if (!parentGroup) {
+        throw new NotFoundError('Parent Group Id');
+      }
+    }
+
     return this.groupRepository.create(group);
   }
 }

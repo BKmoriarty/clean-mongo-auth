@@ -9,18 +9,22 @@ export interface Group {
   name: string;
   description?: string;
   roles: string[];
+  parentId?: string | null; // Reference to parent group
+  children?: string[]; // Reference to child groups
 }
 
 export interface GroupCreate {
   name: string;
   description?: string;
   roles?: string[];
+  parentId?: string | null; // Allow setting parent group on creation
 }
 
 export interface GroupUpdate {
   name?: string;
   description?: string;
   roles?: string[];
+  parentId?: string | null; // Allow updating parent group
 }
 
 export interface EmbeddedRoleResponse {
@@ -34,4 +38,6 @@ export interface GroupResponse {
   name: string;
   description?: string;
   roles: EmbeddedRoleResponse[];
+  parentId?: string | null;
+  children?: GroupResponse[]; // Include children when fetching full hierarchy
 }
